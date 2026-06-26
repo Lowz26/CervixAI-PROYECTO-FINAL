@@ -1,6 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const path = require('path');
+
+// Importa módulos de persistencia
+const database = require('./modules/database');
+const jsonPersistence = require('./modules/json-persistence');
+const iaAnalyzer = require('./modules/ia-analyzer');
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -9,101 +15,309 @@ const jwtSecret = process.env.JWT_SECRET || 'cervix-ai-secret';
 app.use(cors());
 app.use(express.json());
 
-const user = {
-  id: 1,
-  username: 'admin',
-  password: 'admin123',
-  name: 'Administrador',
-};
+// ============================================================
+// INICIALIZACIÓN DEL BACKEND
+// ============================================================
 
-let analysisHistory = [];
-let nextId = 1;
+let isReady = false;
 
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Token no proporcionado' });
+async function initializeBackend() {
+  try {
+    console.log('\n🚀 Inicializando CervixAI Backend...\n');
 
-  jwt.verify(token, jwtSecret, (err, payload) => {
-    if (err) return res.status(403).json({ message: 'Token inválido' });
-    req.user = payload;
-    next();
-  });
+    // Inicializa SQLite
+    await database.initialize();
+
+    // Carga el modelo de IA
+    await iaAnalyzer.loadModel();
+
+    // Carga datos JSON si existen (para sincronización)
+    const savedAnalyses = jsonPersistence.loadAnalyses();
+    console.log(`✓ Análisis cargados del JSON: ${savedAnalyses.length}`);
+
+    isReady = true;
+    console.log('✓ Backend listo para recibir solicitudes\n');
+  } catch (error) {
+    console.error('✗ Error inicializando backend:', error);
+    process.exit(1);
+  }
 }
 
-app.post('/api/login', (req, res) => {
-  const { username, password } = req.body;
-  if (username !== user.username || password !== user.password) {
-    return res.status(401).json({ message: 'Credenciales incorrectas' });
+// Middleware para verificar que el backend está listo
+app.use((req, res, next) => {
+  if (!isReady && req.path !== '/api/health') {
+    return res.status(503).json({ message: 'Backend inicializando...' });
+  }
+  next();
+});
+
+// ============================================================
+// AUTENTICACIÓN
+// ============================================================
+
+async function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token no proporcionado' });
   }
 
-  const token = jwt.sign({ id: user.id, username: user.username, name: user.name }, jwtSecret, {
-    expiresIn: '4h',
-  });
+  try {
+    const payload = jwt.verify(token, jwtSecret);
+    req.user = payload;
+    next();
+  } catch (err) {
+    return res.status(403).json({ message: 'Token inválido o expirado' });
+  }
+}
 
-  res.json({ token, user: { id: user.id, username: user.username, name: user.name } });
+// ============================================================
+// ENDPOINTS DE SALUD Y INFO
+// ============================================================
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: isReady ? 'ready' : 'initializing',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.get('/api/info', (req, res) => {
+  res.json({
+    version: '2.0.0',
+    backend: 'Express.js',
+    database: 'SQLite',
+    persistence: 'JSON',
+    aiModel: iaAnalyzer.getModelInfo(),
+    persistence: {
+      ...jsonPersistence.getFileInfo(),
+    },
+  });
+});
+
+// ============================================================
+// AUTENTICACIÓN Y USUARIO
+// ============================================================
+
+app.post('/api/login', async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    if (!username) {
+      return res.status(400).json({ message: 'Usuario requerido' });
+    }
+
+    // Modo desarrollo: no valida contraseña
+    const token = jwt.sign(
+      { id: 1, username: username, name: username },
+      jwtSecret,
+      { expiresIn: '4h' }
+    );
+
+    res.json({
+      token,
+      user: { id: 1, username: username, name: username },
+    });
+  } catch (error) {
+    console.error('Error en login:', error);
+    res.status(500).json({ message: 'Error en servidor' });
+  }
 });
 
 app.get('/api/user', authenticateToken, (req, res) => {
-  res.json({ id: req.user.id, username: req.user.username, name: req.user.name });
+  res.json({
+    id: req.user.id,
+    username: req.user.username,
+    name: req.user.name,
+  });
 });
 
-app.get('/api/dashboard', authenticateToken, (req, res) => {
-  const totalAnalyses = analysisHistory.length;
-  const lastAnalysis = analysisHistory[analysisHistory.length - 1] || null;
-  const summary = {
-    totalAnalyses,
-    lastAnalysis,
-    positiveCount: analysisHistory.filter((item) => item.result === 'positivo').length,
-    negativeCount: analysisHistory.filter((item) => item.result === 'negativo').length,
-  };
-  res.json({ summary, recommendations: 'Este backend utiliza almacenamiento en memoria y no persiste los datos entre reinicios.' });
-});
+// ============================================================
+// DASHBOARD
+// ============================================================
 
-app.post('/api/analyze', authenticateToken, (req, res) => {
-  const { imageName, imageNotes } = req.body;
-  const result = Math.random() > 0.5 ? 'positivo' : 'negativo';
-  const newReport = {
-    id: nextId++,
-    imageName: imageName || `imagen-${Date.now()}`,
-    notes: imageNotes || '',
-    result,
-    analyzedAt: new Date().toISOString(),
-    analyst: req.user.name,
-  };
+app.get('/api/dashboard', authenticateToken, async (req, res) => {
+  try {
+    const stats = await database.getStats();
+    const analyses = await database.getAnalyses();
+    const lastAnalysis = analyses[0] || null;
+    const modelInfo = iaAnalyzer.getModelInfo();
 
-  analysisHistory.push(newReport);
+    const summary = {
+      totalAnalyses: stats.totalAnalyses,
+      positiveCount: stats.positiveCount,
+      negativeCount: stats.negativeCount,
+      avgConfidence: stats.avgConfidence,
+      lastAnalysis,
+    };
 
-  res.json({ message: 'Análisis simulado completado', report: newReport });
-});
-
-app.get('/api/historial', authenticateToken, (req, res) => {
-  res.json({ items: analysisHistory });
-});
-
-app.get('/api/historial/:id', authenticateToken, (req, res) => {
-  const id = Number(req.params.id);
-  const item = analysisHistory.find((entry) => entry.id === id);
-  if (!item) {
-    return res.status(404).json({ message: 'Registro no encontrado' });
+    res.json({
+      summary,
+      modelInfo,
+      recommendations: '✓ Datos persistentes en SQLite y JSON',
+    });
+  } catch (error) {
+    console.error('Error en dashboard:', error);
+    res.status(500).json({ message: 'Error obteniendo dashboard' });
   }
-  res.json(item);
 });
 
-app.delete('/api/historial/:id', authenticateToken, (req, res) => {
-  const id = Number(req.params.id);
-  const index = analysisHistory.findIndex((entry) => entry.id === id);
-  if (index === -1) {
-    return res.status(404).json({ message: 'Registro no encontrado' });
+// ============================================================
+// ANÁLISIS
+// ============================================================
+
+app.post('/api/analyze', authenticateToken, async (req, res) => {
+  try {
+    const { imageName, imageNotes } = req.body;
+
+    // Usa el modelo de IA para predicción
+    const prediction = await iaAnalyzer.predict(imageName, imageNotes);
+
+    // Guarda en base de datos
+    const analysis = await database.insertAnalysis({
+      imageName: imageName || `imagen-${Date.now()}`,
+      notes: imageNotes || '',
+      result: prediction.result,
+      confidence: prediction.confidence,
+      modelVersion: prediction.modelVersion,
+      analyst: req.user.name,
+    });
+
+    // Sincroniza con JSON
+    const allAnalyses = await database.getAnalyses();
+    jsonPersistence.saveAnalyses(allAnalyses);
+
+    res.json({
+      message: 'Análisis completado con el modelo de IA',
+      report: analysis,
+      prediction: {
+        confidence: prediction.confidence,
+        modelVersion: prediction.modelVersion,
+      },
+    });
+  } catch (error) {
+    console.error('Error en análisis:', error);
+    res.status(500).json({ message: 'Error realizando análisis' });
   }
-  analysisHistory.splice(index, 1);
-  res.json({ message: 'Registro eliminado' });
 });
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', mode: 'memory-only' });
+// ============================================================
+// HISTORIAL
+// ============================================================
+
+app.get('/api/historial', authenticateToken, async (req, res) => {
+  try {
+    const items = await database.getAnalyses();
+    res.json({ items });
+  } catch (error) {
+    console.error('Error obteniendo historial:', error);
+    res.status(500).json({ message: 'Error obteniendo historial' });
+  }
 });
 
-app.listen(port, () => {
-  console.log(`Backend listo en http://localhost:${port}`);
+app.get('/api/historial/:id', authenticateToken, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const item = await database.getAnalysis(id);
+
+    if (!item) {
+      return res.status(404).json({ message: 'Registro no encontrado' });
+    }
+
+    res.json(item);
+  } catch (error) {
+    console.error('Error obteniendo análisis:', error);
+    res.status(500).json({ message: 'Error obteniendo análisis' });
+  }
+});
+
+app.delete('/api/historial/:id', authenticateToken, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const item = await database.getAnalysis(id);
+
+    if (!item) {
+      return res.status(404).json({ message: 'Registro no encontrado' });
+    }
+
+    await database.deleteAnalysis(id);
+
+    // Sincroniza con JSON
+    const allAnalyses = await database.getAnalyses();
+    jsonPersistence.saveAnalyses(allAnalyses);
+
+    res.json({ message: 'Registro eliminado' });
+  } catch (error) {
+    console.error('Error eliminando análisis:', error);
+    res.status(500).json({ message: 'Error eliminando análisis' });
+  }
+});
+
+// ============================================================
+// ESTADÍSTICAS Y EXPORTACIÓN
+// ============================================================
+
+app.get('/api/statistics', authenticateToken, async (req, res) => {
+  try {
+    const stats = await database.getStats();
+    const training = await database.getLatestTraining();
+
+    res.json({
+      analyses: stats,
+      model: {
+        version: training?.modelVersion,
+        accuracy: training?.accuracy,
+        trainingDate: training?.trainingDate,
+      },
+    });
+  } catch (error) {
+    console.error('Error obteniendo estadísticas:', error);
+    res.status(500).json({ message: 'Error obteniendo estadísticas' });
+  }
+});
+
+// ============================================================
+// MANEJO DE ERRORES
+// ============================================================
+
+app.use((req, res) => {
+  res.status(404).json({ message: 'Ruta no encontrada' });
+});
+
+app.use((err, req, res, next) => {
+  console.error('Error interno:', err);
+  res.status(500).json({ message: 'Error interno del servidor' });
+});
+
+// ============================================================
+// SERVIDOR
+// ============================================================
+
+// Maneja cierre gracioso del servidor
+process.on('SIGTERM', async () => {
+  console.log('\n📴 Cerrando servidor...');
+  await database.close();
+  process.exit(0);
+});
+
+// Inicia el servidor
+async function start() {
+  await initializeBackend();
+
+  server = app.listen(port, () => {
+    console.log(`\n✓ Backend escuchando en http://localhost:${port}`);
+    console.log(`✓ Endpoints disponibles:`);
+    console.log(`   - POST   /api/login`);
+    console.log(`   - GET    /api/dashboard`);
+    console.log(`   - POST   /api/analyze`);
+    console.log(`   - GET    /api/historial`);
+    console.log(`   - GET    /api/statistics`);
+    console.log(`   - GET    /api/info\n`);
+  });
+}
+
+start().catch((error) => {
+  console.error('✗ Error iniciando servidor:', error);
+  process.exit(1);
 });

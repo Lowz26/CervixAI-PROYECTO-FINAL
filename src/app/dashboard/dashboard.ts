@@ -38,7 +38,7 @@ export class DashboardComponent implements OnInit {
 
     try {
       const token = localStorage.getItem('cervixai-token');
-      const response = await fetch('/api/dashboard', {
+      const response = await fetch('http://localhost:4000/api/dashboard', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -68,7 +68,7 @@ export class DashboardComponent implements OnInit {
     try {
       const token = localStorage.getItem('cervixai-token');
       const body = { imageName: `manual-${Date.now()}`, imageNotes: 'Análisis iniciado desde UI' };
-      const response = await fetch('/api/analyze', {
+      const response = await fetch('http://localhost:4000/api/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,0 +1,33 @@
+{
+  "version": "v1782514261030",
+  "type": "binary-classification",
+  "createdAt": "2026-06-26T22:51:01.040Z",
+  "trainingDuration": 2,
+  "samplesCount": 100,
+  "accuracy": 0.93,
+  "precision": 0.8157894736842105,
+  "recall": 1,
+  "f1Score": 0.898550724637681,
+  "loss": 0.6297503523051506,
+  "weights": {
+    "contrast_weight": 0.5532089224407295,
+    "color_weight": 0.06302126451796686,
+    "texture_weight": 0.3199164675669093,
+    "shape_weight": 0.050944503788592055,
+    "size_weight": 45984.547627156426
+  },
+  "threshold": 0.5,
+  "features": [
+    "color",
+    "texture",
+    "shape",
+    "size",
+    "contrast",
+    "brightness"
+  ],
+  "metadata": {
+    "positiveCount": 31,
+    "negativeCount": 69,
+    "avgConfidence": "0.380"
+  }
+}

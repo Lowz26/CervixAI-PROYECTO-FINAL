@@ -1,13 +1,19 @@
 {
   "name": "cervix-ai-backend",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "train": "node scripts/train-model.js",
+    "generate-data": "node scripts/generate-training-data.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.0"
+    "jsonwebtoken": "^9.0.0",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }

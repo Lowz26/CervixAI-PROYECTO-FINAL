@@ -1,0 +1,22 @@
+[
+  {
+    "id": 2,
+    "imageName": "test-sample",
+    "notes": "Prueba de análisis",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-06-26 22:51:36",
+    "analyst": "Administrador"
+  },
+  {
+    "id": 1,
+    "imageName": "test-image-001",
+    "notes": "Prueba de análisis",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782513942000",
+    "analyzedAt": "2026-06-26 22:46:30",
+    "analyst": "Administrador"
+  }
+]

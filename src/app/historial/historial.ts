@@ -24,7 +24,7 @@ export class HistorialComponent implements OnInit {
 
     try {
       const token = localStorage.getItem('cervixai-token');
-      const response = await fetch('/api/historial', {
+      const response = await fetch('http://localhost:4000/api/historial', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

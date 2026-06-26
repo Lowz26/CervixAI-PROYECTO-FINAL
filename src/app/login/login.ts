@@ -24,15 +24,21 @@ export class LoginComponent {
     this.loading = true;
 
     try {
-      const response = await fetch('/api/login', {
+      if (!this.email) {
+        this.errorMessage = 'Ingresa un usuario';
+        this.loading = false;
+        return;
+      }
+
+      const response = await fetch('http://localhost:4000/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: this.email, password: this.password }),
+        body: JSON.stringify({ username: this.email }),
       });
 
       const data = await response.json();
       if (!response.ok) {
-        this.errorMessage = data.message || 'Credenciales incorrectas';
+        this.errorMessage = data.message || 'Error al iniciar sesión';
         return;
       }
 
