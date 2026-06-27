@@ -1,0 +1,51 @@
+<div class="login-wrapper">
+  <div class="login-header">
+    <span class="material-symbols-outlined header-icon">biotech</span>
+    <h1>CervixAI Clinical</h1>
+    <p>Sistema de Análisis y Diagnóstico Profesional</p>
+  </div>
+
+  <div class="login-card">
+    <div class="card-title">
+      <h2>Bienvenido, Doctor</h2>
+      <p>Acceda a su panel clínico</p>
+    </div>
+
+    <form #loginForm="ngForm" (ngSubmit)="entrarAlDashboard($event)">
+      <div class="form-group">
+        <label>CORREO ELECTRÓNICO</label>
+        <div class="input-container">
+          <span class="material-symbols-outlined input-icon">mail</span>
+          <input name="email" type="email" placeholder="ejemplo@hospital.com" [(ngModel)]="email">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label-row">
+          <label>CONTRASEÑA</label>
+          <a href="#" class="forgot-link">¿Olvidó su contraseña?</a>
+        </div>
+        <div class="input-container">
+          <span class="material-symbols-outlined input-icon">lock</span>
+          <input name="password" type="password" placeholder="••••••••" [(ngModel)]="password">
+          <span class="material-symbols-outlined input-icon clickable-icon">visibility</span>
+        </div>
+      </div>
+      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="remember">
+        <label for="remember" class="normal-case">Mantener sesión iniciada</label>
+      </div>
+
+      <button type="submit" class="login-btn">
+        Iniciar sesión
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+    </form>
+
+    <div class="card-footer">
+      <p>¿No tiene una cuenta? <a href="#">Contacte al administrador</a></p>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,35 @@
 [
   {
+    "id": 5,
+    "imageName": "manual-1782517344736",
+    "notes": "Análisis iniciado desde UI",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-06-26 23:42:24",
+    "analyst": "admin"
+  },
+  {
+    "id": 4,
+    "imageName": "manual-1782517325399",
+    "notes": "Análisis iniciado desde UI",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-06-26 23:42:05",
+    "analyst": "admin"
+  },
+  {
+    "id": 3,
+    "imageName": "manual-1782517320456",
+    "notes": "Análisis iniciado desde UI",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-06-26 23:42:00",
+    "analyst": "admin"
+  },
+  {
     "id": 2,
     "imageName": "test-sample",
     "notes": "Prueba de análisis",
