@@ -12,11 +12,13 @@ body.daltonism-mode .badge-normal {
 }
 
 body.daltonism-mode .red-icon,
-body.daltonism-mode .red-text {
+body.daltonism-mode .red-text,
+body.daltonism-mode .trend.negative {
   color: #ea580c !important;
 }
 
-body.daltonism-mode .green-text {
+body.daltonism-mode .green-text,
+body.daltonism-mode .trend.positive {
   color: #0284c7 !important;
 }
 
