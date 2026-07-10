@@ -22,6 +22,12 @@ class MobileViTInferenceService:
         self.model = None
         self.classes: List[str] = []
         self.transform = build_transform()
+        
+        # Optimizaciones extremas de memoria para Render Free
+        torch.set_num_threads(1)
+        if hasattr(torch, 'set_grad_enabled'):
+            torch.set_grad_enabled(False)
+            
         self._load_model()
 
     def _resolve_model_path(self, model_path: Optional[Path]) -> Path:
