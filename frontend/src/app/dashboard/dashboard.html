@@ -93,7 +93,7 @@
               <td>Paciente #{{ item.id }}</td>
               <td>Colposcopia IA</td>
               <td>
-                <span class="badge" [ngClass]="{'badge-normal': item.result === 'normal', 'badge-anormal': item.result === 'positivo'}">
+                <span class="badge" [ngClass]="{'badge-normal': item.result === 'normal' || item.result === 'negativo', 'badge-anormal': item.result === 'positivo' || item.result === 'anormal'}">
                   {{ item.result | uppercase }}
                 </span>
               </td>
