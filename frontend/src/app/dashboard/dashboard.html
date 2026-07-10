@@ -12,8 +12,8 @@
       <a routerLink="/historial" class="nav-item">
         <span class="material-symbols-outlined">history</span> Historial
       </a>
-      <a class="nav-item" style="cursor: pointer;">
-        <span class="material-symbols-outlined">biotech</span> Nueva Clasificación
+      <a class="nav-item" style="cursor: pointer;" (click)="openModal()">
+        <span class="material-symbols-outlined">biotech</span> Nuevo Análisis
       </a>
     </nav>
 
@@ -30,8 +30,9 @@
     <header class="topbar">
       <span class="breadcrumb">Dashboard Principal</span>
       <div class="topbar-actions">
-        <span class="material-symbols-outlined icon-btn">notifications</span>
-        <span class="material-symbols-outlined icon-btn">settings</span>
+        <span class="material-symbols-outlined icon-btn" (click)="$event.stopPropagation(); $event.preventDefault(); toggleDaltonism()" title="Modo Daltonismo">visibility</span>
+        <span class="material-symbols-outlined icon-btn" (click)="$event.stopPropagation(); showNotification()">notifications</span>
+        <span class="material-symbols-outlined icon-btn" (click)="$event.stopPropagation(); showSettings()">settings</span>
       </div>
     </header>
 
@@ -66,9 +67,9 @@
         <div class="icon-box">
           <span class="material-symbols-outlined">add</span>
         </div>
-        <h2>Nueva Clasificación</h2>
+        <h2>Nuevo Análisis</h2>
         <p>Inicie un nuevo proceso de análisis de imágenes colposcópicas<br>utilizando el motor de visión computacional de CervixAI.</p>
-        <button class="btn-primary" (click)="startAnalysis()">Iniciar Análisis</button>
+        <button class="btn-primary" (click)="openModal()">Iniciar Análisis</button>
       </div>
 
       <div class="table-card">
@@ -125,4 +126,36 @@
       </div>
     </footer>
   </main>
+</div>
+
+<!-- Modal para subir imagen -->
+<div class="modal-overlay" *ngIf="showUploadModal" (click)="showUploadModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Subir Imagen Celular</h2>
+      <span class="material-symbols-outlined close-btn" (click)="showUploadModal = false" style="cursor:pointer">close</span>
+    </div>
+    <div class="modal-body">
+      <div class="upload-area" (click)="fileInput.click()" style="border: 2px dashed #4f46e5; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; margin-bottom: 20px; background-color: rgba(79, 70, 229, 0.05);">
+        <span class="material-symbols-outlined" style="font-size: 40px; color: #4f46e5; margin-bottom: 10px;">cloud_upload</span>
+        <p style="margin: 0; color: #64748b;">Haz clic para seleccionar una imagen (.jpg, .png, .bmp)</p>
+        <p class="selected-file" *ngIf="selectedFile" style="margin-top: 10px; font-weight: bold; color: #1e293b;">{{ selectedFile.name }}</p>
+        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; color: #475569; font-weight: 500;">Notas Clínicas (Opcional)</label>
+        <textarea [(ngModel)]="imageNotes" rows="3" placeholder="Observaciones adicionales..." style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; box-sizing: border-box;"></textarea>
+      </div>
+      
+      <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+        <button class="btn-outline" (click)="showUploadModal = false">Cancelar</button>
+        <button class="btn-primary" (click)="submitAnalysis()" [disabled]="!selectedFile || isAnalyzing">
+          <span *ngIf="!isAnalyzing">Analizar Imagen</span>
+          <span *ngIf="isAnalyzing">Procesando IA...</span>
+        </button>
+      </div>
+      <div class="error-message" *ngIf="analysisError" style="color: #ef4444; margin-top: 16px; text-align: center;">{{ analysisError }}</div>
+    </div>
+  </div>
 </div>

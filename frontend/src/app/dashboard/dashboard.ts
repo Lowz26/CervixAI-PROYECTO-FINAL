@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
@@ -19,6 +20,14 @@ export class DashboardComponent implements OnInit {
   };
   loading = true;
   errorMessage = '';
+
+  showUploadModal = false;
+  selectedFile: File | null = null;
+  imageNotes = '';
+  isAnalyzing = false;
+  analysisError = '';
+
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadDashboard();
@@ -60,34 +69,76 @@ export class DashboardComponent implements OnInit {
       this.errorMessage = 'Error de conexión con el backend';
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
-  async startAnalysis() {
-    this.errorMessage = '';
+  openModal() {
+    this.showUploadModal = true;
+    this.selectedFile = null;
+    this.imageNotes = '';
+    this.analysisError = '';
+    this.cdr.detectChanges();
+  }
+
+  closeModal() {
+    this.showUploadModal = false;
+    this.cdr.detectChanges();
+  }
+
+  onFileSelected(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      this.selectedFile = event.target.files[0];
+      this.cdr.detectChanges();
+    }
+  }
+
+  async submitAnalysis() {
+    if (!this.selectedFile) return;
+    this.isAnalyzing = true;
+    this.analysisError = '';
+    this.cdr.detectChanges();
+
     try {
       const token = localStorage.getItem('cervixai-token');
-      const body = { imageName: `manual-${Date.now()}`, imageNotes: 'Análisis iniciado desde UI' };
+      const formData = new FormData();
+      formData.append('image', this.selectedFile);
+      formData.append('imageNotes', this.imageNotes);
+
       const response = await fetch('http://localhost:4000/api/analyze', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       });
 
       const data = await response.json();
       if (!response.ok) {
-        this.errorMessage = data.message || 'Error al iniciar análisis';
+        this.analysisError = data.message || 'Error al iniciar análisis';
+        this.cdr.detectChanges();
         return;
       }
 
-      // Refresh dashboard and optionally show a brief confirmation
       await this.loadDashboard();
-      alert('Análisis simulado completado y agregado al historial.');
+      this.closeModal();
+      alert(`Análisis IA completado: ${data.report.result.toUpperCase()} (${(data.report.confidence * 100).toFixed(1)}%)`);
     } catch (err) {
-      this.errorMessage = 'No se pudo conectar al backend para iniciar el análisis';
+      this.analysisError = 'No se pudo conectar al backend para iniciar el análisis';
+      this.cdr.detectChanges();
+    } finally {
+      this.isAnalyzing = false;
+      this.cdr.detectChanges();
     }
+  }
+
+  toggleDaltonism() {
+    document.body.classList.toggle('daltonism-mode');
+  }
+
+  showNotification() {
+    alert('No tienes notificaciones nuevas.');
+  }
+
+  showSettings() {
+    alert('Función de configuración en desarrollo.');
   }
 }

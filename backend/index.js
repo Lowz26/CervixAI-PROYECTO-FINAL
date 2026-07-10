@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const multer = require('multer');
+const upload = multer(); // Usar memoria para proxy a FastAPI
 
 // Importa módulos de persistencia
 const database = require('./modules/database');
@@ -167,20 +169,40 @@ app.get('/api/dashboard', authenticateToken, async (req, res) => {
 // ANÁLISIS
 // ============================================================
 
-app.post('/api/analyze', authenticateToken, async (req, res) => {
+app.post('/api/analyze', authenticateToken, upload.single('image'), async (req, res) => {
   try {
-    const { imageName, imageNotes } = req.body;
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ message: 'No se envió ninguna imagen' });
+    }
 
-    // Usa el modelo de IA para predicción
-    const prediction = await iaAnalyzer.predict(imageName, imageNotes);
+    // Proxy a FastAPI
+    const formData = new FormData();
+    const blob = new Blob([file.buffer], { type: file.mimetype });
+    formData.append('file', blob, file.originalname);
+
+    const apiResponse = await fetch('http://localhost:8000/predict', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!apiResponse.ok) {
+      throw new Error(`Error en el modelo de IA: ${apiResponse.statusText}`);
+    }
+
+    const prediction = await apiResponse.json();
+    
+    // Mapear resultado a 'normal' o 'positivo'
+    const predStr = String(prediction.prediction).toLowerCase();
+    const mappedResult = predStr.includes('normal') ? 'normal' : 'positivo';
 
     // Guarda en base de datos
     const analysis = await database.insertAnalysis({
-      imageName: imageName || `imagen-${Date.now()}`,
-      notes: imageNotes || '',
-      result: prediction.result,
+      imageName: file.originalname,
+      notes: req.body.imageNotes || 'Análisis por IA',
+      result: mappedResult,
       confidence: prediction.confidence,
-      modelVersion: prediction.modelVersion,
+      modelVersion: 'MobileViT',
       analyst: req.user.name,
     });
 
@@ -193,12 +215,12 @@ app.post('/api/analyze', authenticateToken, async (req, res) => {
       report: analysis,
       prediction: {
         confidence: prediction.confidence,
-        modelVersion: prediction.modelVersion,
+        modelVersion: 'MobileViT',
       },
     });
   } catch (error) {
     console.error('Error en análisis:', error);
-    res.status(500).json({ message: 'Error realizando análisis' });
+    res.status(500).json({ message: 'Error realizando análisis con la IA' });
   }
 });
 

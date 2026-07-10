@@ -1,1 +1,82 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Modo Accesibilidad: Daltonismo */
+body.daltonism-mode .badge-anormal {
+  background-color: #ffedd5 !important;
+  color: #ea580c !important; /* Naranja alto contraste */
+}
+
+body.daltonism-mode .badge-normal {
+  background-color: #e0f2fe !important;
+  color: #0284c7 !important; /* Azul alto contraste */
+}
+
+body.daltonism-mode .red-icon,
+body.daltonism-mode .red-text {
+  color: #ea580c !important;
+}
+
+body.daltonism-mode .green-text {
+  color: #0284c7 !important;
+}
+
+body.daltonism-mode .green-fill {
+  background-color: #0284c7 !important;
+}
+
+body.daltonism-mode .critical .sc-header .material-symbols-outlined {
+  color: #ea580c !important;
+}
+
+/* Modal UI */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: slideUp 0.3s ease-out;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

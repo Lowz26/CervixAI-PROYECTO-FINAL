@@ -1,5 +1,115 @@
 [
   {
+    "id": 16,
+    "imageName": "024.bmp",
+    "notes": "Análisis por IA",
+    "result": "positivo",
+    "confidence": 0.9307087063789368,
+    "modelVersion": "MobileViT",
+    "analyzedAt": "2026-07-10 06:40:00",
+    "analyst": "asd"
+  },
+  {
+    "id": 15,
+    "imageName": "001.bmp",
+    "notes": "Análisis por IA",
+    "result": "positivo",
+    "confidence": 0.7645458579063416,
+    "modelVersion": "MobileViT",
+    "analyzedAt": "2026-07-10 06:39:39",
+    "analyst": "asd"
+  },
+  {
+    "id": 14,
+    "imageName": "manual-hist-1783663559249",
+    "notes": "Análisis iniciado desde Historial",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-07-10 06:05:59",
+    "analyst": "ASDA"
+  },
+  {
+    "id": 13,
+    "imageName": "manual-1783663266546",
+    "notes": "Análisis iniciado desde UI",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-07-10 06:01:06",
+    "analyst": "asd"
+  },
+  {
+    "id": 12,
+    "imageName": "manual-hist-1783663227616",
+    "notes": "Análisis iniciado desde Historial",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-07-10 06:00:27",
+    "analyst": "asd"
+  },
+  {
+    "id": 11,
+    "imageName": "manual-hist-1783663184831",
+    "notes": "Análisis iniciado desde Historial",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-07-10 05:59:44",
+    "analyst": "asd"
+  },
+  {
+    "id": 10,
+    "imageName": "manual-1783663183203",
+    "notes": "Análisis iniciado desde UI",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-07-10 05:59:43",
+    "analyst": "asd"
+  },
+  {
+    "id": 9,
+    "imageName": "manual-1783663182004",
+    "notes": "Análisis iniciado desde UI",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-07-10 05:59:42",
+    "analyst": "asd"
+  },
+  {
+    "id": 8,
+    "imageName": "manual-1783663176397",
+    "notes": "Análisis iniciado desde UI",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-07-10 05:59:36",
+    "analyst": "asd"
+  },
+  {
+    "id": 7,
+    "imageName": "manual-1783663173967",
+    "notes": "Análisis iniciado desde UI",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-07-10 05:59:33",
+    "analyst": "asd"
+  },
+  {
+    "id": 6,
+    "imageName": "manual-1783663144855",
+    "notes": "Análisis iniciado desde UI",
+    "result": "negativo",
+    "confidence": 0.55,
+    "modelVersion": "v1782514261030",
+    "analyzedAt": "2026-07-10 05:59:04",
+    "analyst": "asd"
+  },
+  {
     "id": 5,
     "imageName": "manual-1782517344736",
     "notes": "Análisis iniciado desde UI",

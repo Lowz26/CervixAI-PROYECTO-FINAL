@@ -2,13 +2,15 @@
   <header class="top-navbar">
     <div class="brand-title">CervixAI Clinical</div>
     <div class="navbar-actions">
-      <span class="material-symbols-outlined icon-btn">notifications</span>
-      <span class="material-symbols-outlined icon-btn">settings</span>
+      <span class="material-symbols-outlined icon-btn" (click)="$event.stopPropagation(); $event.preventDefault(); toggleDaltonism()" title="Modo Daltonismo">visibility</span>
+      <span class="material-symbols-outlined icon-btn" (click)="$event.stopPropagation(); showNotification()">notifications</span>
+      <span class="material-symbols-outlined icon-btn" (click)="$event.stopPropagation(); showSettings()">settings</span>
       <div class="user-profile">
         <img src="https://via.placeholder.com/32" alt="Dr. García" class="avatar-small">
         <span class="user-name">Dr. García</span>
       </div>
     </div>
+
   </header>
 
   <div class="main-body">
@@ -21,13 +23,13 @@
         <a routerLink="/historial" class="nav-item active">
           <span class="material-symbols-outlined">history</span> Historial
         </a>
-        <a class="nav-item" style="cursor: pointer;">
-          <span class="material-symbols-outlined">biotech</span> Nueva Clasificación
+        <a class="nav-item" style="cursor: pointer;" (click)="openModal()">
+          <span class="material-symbols-outlined">biotech</span> Nuevo Análisis
         </a>
       </nav>
       <div class="sidebar-footer">
-        <button class="btn-primary full-width">
-          <span class="material-symbols-outlined">add</span> Iniciar Análisis
+        <button class="btn-primary full-width" (click)="openModal()">
+          <span class="material-symbols-outlined">add</span> Nuevo Análisis
         </button>
       </div>
     </aside>
@@ -43,7 +45,7 @@
             <span class="material-symbols-outlined">search</span>
             <input type="text" placeholder="Buscar por ID o Fecha...">
           </div>
-          <button class="btn-outline">
+          <button class="btn-outline" (click)="filtrar()">
             <span class="material-symbols-outlined">filter_list</span> Filtrar
           </button>
         </div>
@@ -61,8 +63,8 @@
               <th></th>
             </tr>
           </thead>
-          <tbody *ngIf="!loading && items.length > 0; else noItems">
-            <tr *ngFor="let item of items">
+          <tbody *ngIf="!loading && paginatedItems.length > 0; else noItems">
+            <tr *ngFor="let item of paginatedItems">
               <td>{{ item.analyzedAt }}</td>
               <td><img src="https://via.placeholder.com/80x40" class="thumb" alt="Muestra"></td>
               <td>#PX-{{ item.id }}</td>
@@ -73,8 +75,8 @@
               </td>
               <td>
                 <div class="confidence-box">
-                  <span class="conf-value green-text">--</span>
-                  <div class="progress-bar"><div class="fill green-fill" style="width: 75%"></div></div>
+                  <span class="conf-value" [ngClass]="(item.confidence || 0.5) < 0.7 ? 'red-text' : 'green-text'">{{ (item.confidence || 0.5) * 100 | number:'1.0-0' }}%</span>
+                  <div class="progress-bar"><div class="fill" [ngClass]="(item.confidence || 0.5) < 0.7 ? 'red-fill' : 'green-fill'" [style.width.%]="(item.confidence || 0.5) * 100"></div></div>
                 </div>
               </td>
               <td><span class="material-symbols-outlined icon-link">open_in_new</span></td>
@@ -93,15 +95,11 @@
         </ng-template>
 
         <div class="pagination-footer">
-          <span class="showing-text">Mostrando 1 - 10 de 156 resultados</span>
+          <span class="showing-text">Mostrando {{ items.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} - {{ (currentPage * pageSize) > items.length ? items.length : (currentPage * pageSize) }} de {{ items.length }} resultados</span>
           <div class="pagination-controls">
-            <button class="page-btn">&lt;</button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn">3</button>
-            <span class="dots">...</span>
-            <button class="page-btn">16</button>
-            <button class="page-btn">&gt;</button>
+            <button class="page-btn" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
+            <button class="page-btn" *ngFor="let page of pages" [class.active]="currentPage === page" (click)="changePage(page)">{{ page }}</button>
+            <button class="page-btn" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">&gt;</button>
           </div>
         </div>
       </div>
@@ -109,17 +107,17 @@
       <div class="summary-grid">
         <div class="summary-card">
           <div class="sc-header"><span class="material-symbols-outlined">bar_chart</span> Total Analizados</div>
-          <h3>1,254</h3>
-          <p class="trend positive"><span class="material-symbols-outlined">trending_up</span> +12% vs mes anterior</p>
+          <h3>{{ totalAnalyses }}</h3>
+          <p class="trend positive"><span class="material-symbols-outlined">trending_up</span> Datos actualizados</p>
         </div>
         <div class="summary-card">
           <div class="sc-header"><span class="material-symbols-outlined">check_circle</span> Confianza Promedio</div>
-          <h3>96.8%</h3>
-          <p class="trend neutral">Estabilidad clínica óptima</p>
+          <h3>{{ avgConfidence * 100 | number:'1.1-1' }}%</h3>
+          <p class="trend neutral">Basado en todos los análisis</p>
         </div>
         <div class="summary-card critical">
           <div class="sc-header"><span class="material-symbols-outlined red-icon">error</span> Alertas Críticas</div>
-          <h3 class="red-text">3</h3>
+          <h3 class="red-text">{{ criticalAlerts }}</h3>
           <p class="trend negative">Pendientes de revisión manual</p>
         </div>
       </div>
@@ -134,4 +132,36 @@
       <a href="#">Protocolo Médico</a>
     </div>
   </footer>
+</div>
+
+<!-- Modal para subir imagen -->
+<div class="modal-overlay" *ngIf="showUploadModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Subir Imagen Celular</h2>
+      <span class="material-symbols-outlined close-btn" (click)="closeModal()" style="cursor:pointer">close</span>
+    </div>
+    <div class="modal-body">
+      <div class="upload-area" (click)="fileInput.click()" style="border: 2px dashed #4f46e5; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; margin-bottom: 20px; background-color: rgba(79, 70, 229, 0.05);">
+        <span class="material-symbols-outlined" style="font-size: 40px; color: #4f46e5; margin-bottom: 10px;">cloud_upload</span>
+        <p style="margin: 0; color: #64748b;">Haz clic para seleccionar una imagen (.jpg, .png, .bmp)</p>
+        <p class="selected-file" *ngIf="selectedFile" style="margin-top: 10px; font-weight: bold; color: #1e293b;">{{ selectedFile.name }}</p>
+        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; color: #475569; font-weight: 500;">Notas Clínicas (Opcional)</label>
+        <textarea [(ngModel)]="imageNotes" rows="3" placeholder="Observaciones adicionales..." style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; box-sizing: border-box;"></textarea>
+      </div>
+      
+      <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+        <button class="btn-outline" (click)="closeModal()">Cancelar</button>
+        <button class="btn-primary" (click)="submitAnalysis()" [disabled]="!selectedFile || isAnalyzing">
+          <span *ngIf="!isAnalyzing">Analizar Imagen</span>
+          <span *ngIf="isAnalyzing">Procesando IA...</span>
+        </button>
+      </div>
+      <div class="error-message" *ngIf="analysisError" style="color: #ef4444; margin-top: 16px; text-align: center;">{{ analysisError }}</div>
+    </div>
+  </div>
 </div>
