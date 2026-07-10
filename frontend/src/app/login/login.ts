@@ -30,7 +30,8 @@ export class LoginComponent {
         return;
       }
 
-      const response = await fetch('http://localhost:4000/api/login', {
+      const backendUrl = window.location.hostname === 'localhost' ? 'http://localhost:4000' : 'https://cervixai-backend.onrender.com';
+      const response = await fetch(`${backendUrl}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: this.email }),

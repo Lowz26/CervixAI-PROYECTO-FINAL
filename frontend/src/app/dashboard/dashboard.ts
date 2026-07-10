@@ -47,7 +47,8 @@ export class DashboardComponent implements OnInit {
 
     try {
       const token = localStorage.getItem('cervixai-token');
-      const response = await fetch('http://localhost:4000/api/dashboard', {
+      const backendUrl = window.location.hostname === 'localhost' ? 'http://localhost:4000' : 'https://cervixai-backend.onrender.com';
+      const response = await fetch(`${backendUrl}/api/dashboard`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -105,7 +106,8 @@ export class DashboardComponent implements OnInit {
       formData.append('image', this.selectedFile);
       formData.append('imageNotes', this.imageNotes);
 
-      const response = await fetch('http://localhost:4000/api/analyze', {
+      const backendUrl = window.location.hostname === 'localhost' ? 'http://localhost:4000' : 'https://cervixai-backend.onrender.com';
+      const response = await fetch(`${backendUrl}/api/analyze`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
