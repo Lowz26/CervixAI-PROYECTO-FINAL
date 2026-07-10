@@ -20,6 +20,15 @@
 .content-area { padding: 32px; flex-grow: 1; background-color: #fafbfd; }
 .welcome-section h1 { font-size: 24px; margin: 0 0 8px 0; color: #111; }
 .welcome-section p { color: #555; font-size: 14px; margin: 0 0 24px 0; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
+.summary-card { background: white; border: 1px solid #e1e5eb; border-radius: 8px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+.sc-header { display: flex; align-items: center; gap: 8px; color: #666; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+.sc-header .material-symbols-outlined { color: #1a56db; font-size: 20px; }
+.summary-card h3 { font-size: 32px; margin: 0 0 8px 0; color: #111; }
+.summary-card .trend { font-size: 12px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 4px; }
+.trend.positive { color: #1e7e44; }
+.trend.negative { color: #c81e1e; }
+.trend.neutral { color: #666; }
 .action-card { background: white; border: 1px solid #e1e5eb; border-radius: 8px; padding: 48px 24px; text-align: center; margin-bottom: 32px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
 .icon-box { width: 64px; height: 64px; background-color: #1a56db; color: white; border-radius: 12px; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px auto; }
 .icon-box span { font-size: 32px; }
