@@ -181,7 +181,7 @@ app.post('/api/analyze', authenticateToken, upload.single('image'), async (req, 
     const blob = new Blob([file.buffer], { type: file.mimetype });
     formData.append('file', blob, file.originalname);
 
-    const apiResponse = await fetch('http://localhost:8000/predict', {
+    const apiResponse = await fetch('http://127.0.0.1:8000/predict', {
       method: 'POST',
       body: formData,
     });
