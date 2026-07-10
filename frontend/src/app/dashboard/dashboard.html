@@ -88,29 +88,18 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>24 Oct 2023</td>
-              <td>#CX-9842</td>
+            <tr *ngFor="let item of recentAnalyses">
+              <td>{{ item.date | date:'dd MMM yyyy HH:mm' }}</td>
+              <td>Paciente #{{ item.id }}</td>
               <td>Colposcopia IA</td>
-              <td><span class="badge badge-normal">NORMAL</span></td>
+              <td>
+                <span class="badge" [ngClass]="{'badge-normal': item.result === 'normal', 'badge-anormal': item.result === 'positivo'}">
+                  {{ item.result | uppercase }}
+                </span>
+              </td>
             </tr>
-            <tr>
-              <td>24 Oct 2023</td>
-              <td>#CX-9840</td>
-              <td>Screening Preventivo</td>
-              <td><span class="badge badge-anormal">ANORMAL</span></td>
-            </tr>
-            <tr>
-              <td>23 Oct 2023</td>
-              <td>#CX-9835</td>
-              <td>Colposcopia IA</td>
-              <td><span class="badge badge-normal">NORMAL</span></td>
-            </tr>
-            <tr>
-              <td>23 Oct 2023</td>
-              <td>#CX-9831</td>
-              <td>Seguimiento Clínico</td>
-              <td><span class="badge badge-normal">NORMAL</span></td>
+            <tr *ngIf="recentAnalyses.length === 0">
+              <td colspan="4" style="text-align: center; color: #666;">No hay análisis recientes.</td>
             </tr>
           </tbody>
         </table>

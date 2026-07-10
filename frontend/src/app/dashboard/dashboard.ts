@@ -21,6 +21,8 @@ export class DashboardComponent implements OnInit {
   loading = true;
   errorMessage = '';
 
+  recentAnalyses: any[] = [];
+
   showUploadModal = false;
   selectedFile: File | null = null;
   imageNotes = '';
@@ -66,6 +68,8 @@ export class DashboardComponent implements OnInit {
         negativeCount: data.summary.negativeCount,
         lastAnalysis: data.summary.lastAnalysis,
       };
+      
+      this.recentAnalyses = data.recentAnalyses || [];
     } catch (error) {
       this.errorMessage = 'Error de conexión con el backend';
     } finally {

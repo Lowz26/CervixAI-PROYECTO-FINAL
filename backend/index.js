@@ -154,8 +154,11 @@ app.get('/api/dashboard', authenticateToken, async (req, res) => {
       lastAnalysis,
     };
 
+    const recentAnalyses = analyses.slice(0, 4);
+
     res.json({
       summary,
+      recentAnalyses,
       modelInfo,
       recommendations: '✓ Datos persistentes en SQLite y JSON',
     });
