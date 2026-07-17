@@ -2,7 +2,7 @@
   <header class="top-navbar">
     <div class="brand-title">CervixAI Clinical</div>
     <div class="navbar-actions">
-      <span class="material-symbols-outlined icon-btn" (click)="$event.stopPropagation(); $event.preventDefault(); toggleDaltonism()" title="Modo Daltonismo">visibility</span>
+      <span class="material-symbols-outlined icon-btn" (click)="$event.stopPropagation(); $event.preventDefault(); toggleDaltonism()" [title]="t.topbar.colorblind">visibility</span>
       <span class="material-symbols-outlined icon-btn" (click)="$event.stopPropagation(); showNotification()">notifications</span>
       <span class="material-symbols-outlined icon-btn" (click)="$event.stopPropagation(); showSettings()">settings</span>
       <div class="user-profile">
@@ -15,21 +15,21 @@
 
   <div class="main-body">
     <aside class="sidebar">
-      <span class="sidebar-label">PANEL DE CONTROL</span>
+      <span class="sidebar-label">{{ t.sidebar.panel }}</span>
       <nav class="nav-menu">
         <a routerLink="/dashboard" class="nav-item">
           <span class="material-symbols-outlined">grid_view</span> Dashboard
         </a>
         <a routerLink="/historial" class="nav-item active">
-          <span class="material-symbols-outlined">history</span> Historial
+          <span class="material-symbols-outlined">history</span> {{ t.sidebar.history }}
         </a>
         <a class="nav-item" style="cursor: pointer;" (click)="openModal()">
-          <span class="material-symbols-outlined">biotech</span> Nuevo Análisis
+          <span class="material-symbols-outlined">biotech</span> {{ t.sidebar.newAnalysis }}
         </a>
       </nav>
       <div class="sidebar-footer">
         <button class="btn-primary full-width" (click)="openModal()">
-          <span class="material-symbols-outlined">add</span> Nuevo Análisis
+          <span class="material-symbols-outlined">add</span> {{ t.sidebar.newAnalysis }}
         </button>
       </div>
     </aside>
@@ -37,16 +37,16 @@
     <main class="content-area">
       <div class="page-header">
         <div>
-          <h1>Historial de Pacientes</h1>
-          <p>Registros clínicos y diagnósticos procesados por CervixAI.</p>
+          <h1>{{ t.history.title }}</h1>
+          <p>{{ t.history.desc }}</p>
         </div>
         <div class="header-tools">
           <div class="search-box">
             <span class="material-symbols-outlined">search</span>
-            <input type="text" placeholder="Buscar por ID o Fecha...">
+            <input type="text" [placeholder]="t.history.searchPlaceholder">
           </div>
           <button class="btn-outline" (click)="filtrar()">
-            <span class="material-symbols-outlined">filter_list</span> Filtrar
+            <span class="material-symbols-outlined">filter_list</span> {{ t.history.filter }}
           </button>
         </div>
       </div>
@@ -55,11 +55,11 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th>FECHA DE ESTUDIO</th>
-              <th>MUESTRA (MINIATURA)</th>
-              <th>ID PACIENTE</th>
-              <th>RESULTADO</th>
-              <th>CONFIANZA AI</th>
+              <th>{{ t.history.colDate }}</th>
+              <th>{{ t.history.colSample }}</th>
+              <th>{{ t.history.colId }}</th>
+              <th>{{ t.history.colResult }}</th>
+              <th>{{ t.history.colConf }}</th>
               <th></th>
             </tr>
           </thead>
@@ -70,7 +70,7 @@
               <td>#PX-{{ item.id }}</td>
               <td>
                 <span class="badge" [ngClass]="item.result === 'positivo' ? 'badge-anormal' : 'badge-normal'">
-                  {{ item.result === 'positivo' ? 'ANORMAL' : 'NORMAL' }}
+                  {{ item.result === 'positivo' ? t.history.abnormal : t.history.normal }}
                 </span>
               </td>
               <td>
@@ -87,15 +87,15 @@
         <ng-template #noItems>
           <tr>
             <td colspan="6" class="empty-state">
-              <div *ngIf="loading">Cargando historial...</div>
-              <div *ngIf="!loading && !errorMessage">No hay registros disponibles.</div>
+              <div *ngIf="loading">{{ t.loading }}</div>
+              <div *ngIf="!loading && !errorMessage">{{ t.history.empty }}</div>
               <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
             </td>
           </tr>
         </ng-template>
 
         <div class="pagination-footer">
-          <span class="showing-text">Mostrando {{ items.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} - {{ (currentPage * pageSize) > items.length ? items.length : (currentPage * pageSize) }} de {{ items.length }} resultados</span>
+          <span class="showing-text">{{ t.history.showing }} {{ items.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} - {{ (currentPage * pageSize) > items.length ? items.length : (currentPage * pageSize) }} {{ t.history.of }} {{ items.length }} {{ t.history.results }}</span>
           <div class="pagination-controls">
             <button class="page-btn" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
             <button class="page-btn" *ngFor="let page of pages" [class.active]="currentPage === page" (click)="changePage(page)">{{ page }}</button>
@@ -106,30 +106,30 @@
 
       <div class="summary-grid">
         <div class="summary-card">
-          <div class="sc-header"><span class="material-symbols-outlined">bar_chart</span> Total Analizados</div>
+          <div class="sc-header"><span class="material-symbols-outlined">bar_chart</span> {{ t.summary.total }}</div>
           <h3>{{ totalAnalyses }}</h3>
-          <p class="trend positive"><span class="material-symbols-outlined">trending_up</span> Datos actualizados</p>
+          <p class="trend positive"><span class="material-symbols-outlined">trending_up</span> {{ t.summary.trendTotal }}</p>
         </div>
         <div class="summary-card">
-          <div class="sc-header"><span class="material-symbols-outlined">check_circle</span> Confianza Promedio</div>
+          <div class="sc-header"><span class="material-symbols-outlined">check_circle</span> {{ t.summary.avgConf }}</div>
           <h3>{{ avgConfidence * 100 | number:'1.1-1' }}%</h3>
-          <p class="trend neutral">Basado en todos los análisis</p>
+          <p class="trend neutral">{{ t.summary.trendConf }}</p>
         </div>
         <div class="summary-card critical">
-          <div class="sc-header"><span class="material-symbols-outlined red-icon">error</span> Alertas Críticas</div>
+          <div class="sc-header"><span class="material-symbols-outlined red-icon">error</span> {{ t.summary.critical }}</div>
           <h3 class="red-text">{{ criticalAlerts }}</h3>
-          <p class="trend negative">Pendientes de revisión manual</p>
+          <p class="trend negative">{{ t.summary.trendCritical }}</p>
         </div>
       </div>
     </main>
   </div>
   
   <footer class="dashboard-footer">
-    <p>© 2024 CervixAI System. <strong>Uso Clínico Profesional.</strong></p>
+    <p>© 2024 CervixAI System. <strong>{{ t.footer.use }}</strong></p>
     <div class="footer-links">
-      <a href="#">Soporte Técnico</a>
-      <a href="#">Privacidad de Datos</a>
-      <a href="#">Protocolo Médico</a>
+      <a href="#">{{ t.footer.support }}</a>
+      <a href="#">{{ t.footer.privacy }}</a>
+      <a href="#">{{ t.footer.protocol }}</a>
     </div>
   </footer>
 </div>
@@ -138,30 +138,161 @@
 <div class="modal-overlay" *ngIf="showUploadModal" (click)="closeModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Subir Imagen Celular</h2>
+      <h2>{{ t.modalUpload.title }}</h2>
       <span class="material-symbols-outlined close-btn" (click)="closeModal()" style="cursor:pointer">close</span>
     </div>
     <div class="modal-body">
       <div class="upload-area" (click)="fileInput.click()" style="border: 2px dashed #4f46e5; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; margin-bottom: 20px; background-color: rgba(79, 70, 229, 0.05);">
         <span class="material-symbols-outlined" style="font-size: 40px; color: #4f46e5; margin-bottom: 10px;">cloud_upload</span>
-        <p style="margin: 0; color: #64748b;">Haz clic para seleccionar una imagen (.jpg, .png, .bmp)</p>
+        <p style="margin: 0; color: #64748b;">{{ t.modalUpload.drop }} (.jpg, .png, .bmp)</p>
         <p class="selected-file" *ngIf="selectedFile" style="margin-top: 10px; font-weight: bold; color: #1e293b;">{{ selectedFile.name }}</p>
         <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
       </div>
       
       <div class="form-group" style="margin-bottom: 20px;">
-        <label style="display: block; margin-bottom: 8px; color: #475569; font-weight: 500;">Notas Clínicas (Opcional)</label>
-        <textarea [(ngModel)]="imageNotes" rows="3" placeholder="Observaciones adicionales..." style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; box-sizing: border-box;"></textarea>
+        <label style="display: block; margin-bottom: 8px; color: #475569; font-weight: 500;">{{ t.modalUpload.notes }}</label>
+        <textarea [(ngModel)]="imageNotes" rows="3" [placeholder]="t.modalUpload.placeholder" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; box-sizing: border-box;"></textarea>
       </div>
       
       <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
-        <button class="btn-outline" (click)="closeModal()">Cancelar</button>
+        <button class="btn-outline" (click)="closeModal()">{{ t.modalUpload.cancel }}</button>
         <button class="btn-primary" (click)="submitAnalysis()" [disabled]="!selectedFile || isAnalyzing">
-          <span *ngIf="!isAnalyzing">Analizar Imagen</span>
-          <span *ngIf="isAnalyzing">Procesando IA...</span>
+          <span *ngIf="!isAnalyzing">{{ t.modalUpload.btn }}</span>
+          <span *ngIf="isAnalyzing">{{ t.modalUpload.processing }}</span>
         </button>
       </div>
       <div class="error-message" *ngIf="analysisError" style="color: #ef4444; margin-top: 16px; text-align: center;">{{ analysisError }}</div>
     </div>
+  </div>
+</div>
+
+<!-- Modal de Configuración -->
+<div class="modal-overlay" *ngIf="showSettingsModal" (click)="closeSettings()">
+  <div class="modal-content" (click)="$event.stopPropagation()" style="max-width: 450px;">
+    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 style="margin: 0; font-size: 20px; color: #111;">{{ t.modalSettings.title }}</h2>
+      <span class="material-symbols-outlined close-btn" (click)="closeSettings()" style="cursor:pointer; color: #64748b;">close</span>
+    </div>
+    <div class="modal-body">
+      
+      <!-- Perfil -->
+      <div class="settings-group" style="margin-bottom: 24px;">
+        <h3 style="font-size: 13px; color: #64748b; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">{{ t.modalSettings.profile }}</h3>
+        <div class="setting-item" style="padding: 16px; border: 1px solid #e1e5eb; border-radius: 8px; background: #fafbfd; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; gap: 16px; align-items: center;">
+              <div class="icon-bg" style="background-color: #fce7f3; color: #db2777; padding: 8px; border-radius: 8px; display: flex;">
+                <span class="material-symbols-outlined">account_circle</span>
+              </div>
+              <div>
+                <div style="font-weight: 600; color: #1e293b; font-size: 14px;">{{ t.modalSettings.photo }}</div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 4px;">{{ t.modalSettings.photoDesc }}</div>
+              </div>
+            </div>
+            <button class="btn-outline" (click)="photoInput.click()" style="padding: 6px 12px; font-size: 12px;">{{ t.modalSettings.change }}</button>
+            <input type="file" #photoInput (change)="onProfilePhotoSelected($event)" accept="image/*" style="display: none;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Seguridad -->
+      <div class="settings-group" style="margin-bottom: 24px;">
+        <h3 style="font-size: 13px; color: #64748b; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">{{ t.modalSettings.security }}</h3>
+        
+        <div class="setting-item" style="padding: 16px; border: 1px solid #e1e5eb; border-radius: 8px; background: #fafbfd; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="display: flex; gap: 16px; align-items: center;">
+              <div class="icon-bg" style="background-color: #fef3c7; color: #d97706; padding: 8px; border-radius: 8px; display: flex;">
+                <span class="material-symbols-outlined">lock</span>
+              </div>
+              <div>
+                <div style="font-weight: 600; color: #1e293b; font-size: 14px;">{{ t.modalSettings.password }}</div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 4px;">{{ t.modalSettings.passwordDesc }}</div>
+              </div>
+            </div>
+            <button class="btn-outline" (click)="changePassword()" style="padding: 6px 12px; font-size: 12px;">{{ t.modalSettings.update }}</button>
+          </div>
+          <div *ngIf="passwordChangeMessage" style="font-size: 12px; color: #059669; background: #d1fae5; padding: 8px; border-radius: 4px;">{{passwordChangeMessage}}</div>
+        </div>
+
+        <div class="setting-item" style="padding: 16px; border: 1px solid #e1e5eb; border-radius: 8px; background: #fafbfd;">
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; gap: 16px; align-items: center;">
+              <div class="icon-bg" style="background-color: #e0f2fe; color: #0284c7; padding: 8px; border-radius: 8px; display: flex;">
+                <span class="material-symbols-outlined">mark_email_read</span>
+              </div>
+              <div>
+                <div style="font-weight: 600; color: #1e293b; font-size: 14px;">{{ t.modalSettings.email }}</div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 4px;">{{ t.modalSettings.emailDesc }}</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <input type="email" [(ngModel)]="recoveryEmail" placeholder="ejemplo@correo.com" style="flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+              <button class="btn-primary" (click)="saveRecoveryEmail()" [disabled]="!recoveryEmail" style="padding: 8px 16px; font-size: 12px; border-radius: 6px; cursor: pointer; border: none;">{{ t.modalSettings.save }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accesibilidad y Preferencias -->
+      <div class="settings-group" style="margin-bottom: 24px;">
+        <h3 style="font-size: 13px; color: #64748b; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">{{ t.modalSettings.prefs }}</h3>
+        
+        <div class="setting-item" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid #e1e5eb; border-radius: 8px; background: #fafbfd; margin-bottom: 12px;">
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <div class="icon-bg" style="background-color: #dcfce7; color: #16a34a; padding: 8px; border-radius: 8px; display: flex;">
+              <span class="material-symbols-outlined">language</span>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #1e293b; font-size: 14px;">{{ t.modalSettings.lang }}</div>
+              <div style="font-size: 12px; color: #64748b; margin-top: 4px;">{{ t.modalSettings.langDesc }}</div>
+            </div>
+          </div>
+          <select [(ngModel)]="currentLanguage" (change)="changeLanguage(currentLanguage)" style="padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; background-color: white; color: #333; outline: none;">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+
+        <div class="setting-item" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid #e1e5eb; border-radius: 8px; background: #fafbfd;">
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <div class="icon-bg" style="background-color: #e0e7ff; color: #4f46e5; padding: 8px; border-radius: 8px; display: flex;">
+              <span class="material-symbols-outlined">visibility</span>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #1e293b; font-size: 14px;">{{ t.modalSettings.cb }}</div>
+              <div style="font-size: 12px; color: #64748b; margin-top: 4px;">{{ t.modalSettings.cbDesc }}</div>
+            </div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" [checked]="isDaltonismActive" (change)="toggleDaltonism()">
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Cerrar Sesión -->
+      <div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid #e1e5eb; text-align: center;">
+        <button class="btn-outline" (click)="logout()" style="color: #ef4444; border-color: #fca5a5; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; padding: 12px;">
+          <span class="material-symbols-outlined">logout</span> {{ t.modalSettings.logout }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Resultado -->
+<div class="modal-overlay" *ngIf="showResultModal" (click)="showResultModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()" style="text-align: center; max-width: 400px; padding: 40px 20px;">
+    <div style="width: 80px; height: 80px; border-radius: 50%; background-color: #f0fdf4; color: #16a34a; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+      <span class="material-symbols-outlined" style="font-size: 40px;">check_circle</span>
+    </div>
+    <h2 style="margin-bottom: 10px; color: #1e293b;">{{ t.alerts.aiComplete }}</h2>
+    <p style="font-size: 18px; margin-bottom: 24px; color: #475569;">
+      Resultado: <strong>{{ analysisResultData?.result }}</strong><br>
+      Confianza: <strong>{{ analysisResultData?.confidence }}%</strong>
+    </p>
+    <button class="btn-primary" style="width: 100%;" (click)="showResultModal = false">Aceptar</button>
   </div>
 </div>

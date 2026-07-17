@@ -1,5 +1,25 @@
 [
   {
+    "id": 18,
+    "imageName": "012.bmp",
+    "notes": "Análisis por IA",
+    "result": "positivo",
+    "confidence": 0.6274635791778564,
+    "modelVersion": "MobileViT",
+    "analyzedAt": "2026-07-17 03:58:12",
+    "analyst": "asd"
+  },
+  {
+    "id": 17,
+    "imageName": "017.bmp",
+    "notes": "Análisis por IA",
+    "result": "positivo",
+    "confidence": 0.4963926076889038,
+    "modelVersion": "MobileViT",
+    "analyzedAt": "2026-07-17 03:47:06",
+    "analyst": "asd"
+  },
+  {
     "id": 16,
     "imageName": "024.bmp",
     "notes": "Análisis por IA",
@@ -18,145 +38,5 @@
     "modelVersion": "MobileViT",
     "analyzedAt": "2026-07-10 06:39:39",
     "analyst": "asd"
-  },
-  {
-    "id": 14,
-    "imageName": "manual-hist-1783663559249",
-    "notes": "Análisis iniciado desde Historial",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-07-10 06:05:59",
-    "analyst": "ASDA"
-  },
-  {
-    "id": 13,
-    "imageName": "manual-1783663266546",
-    "notes": "Análisis iniciado desde UI",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-07-10 06:01:06",
-    "analyst": "asd"
-  },
-  {
-    "id": 12,
-    "imageName": "manual-hist-1783663227616",
-    "notes": "Análisis iniciado desde Historial",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-07-10 06:00:27",
-    "analyst": "asd"
-  },
-  {
-    "id": 11,
-    "imageName": "manual-hist-1783663184831",
-    "notes": "Análisis iniciado desde Historial",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-07-10 05:59:44",
-    "analyst": "asd"
-  },
-  {
-    "id": 10,
-    "imageName": "manual-1783663183203",
-    "notes": "Análisis iniciado desde UI",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-07-10 05:59:43",
-    "analyst": "asd"
-  },
-  {
-    "id": 9,
-    "imageName": "manual-1783663182004",
-    "notes": "Análisis iniciado desde UI",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-07-10 05:59:42",
-    "analyst": "asd"
-  },
-  {
-    "id": 8,
-    "imageName": "manual-1783663176397",
-    "notes": "Análisis iniciado desde UI",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-07-10 05:59:36",
-    "analyst": "asd"
-  },
-  {
-    "id": 7,
-    "imageName": "manual-1783663173967",
-    "notes": "Análisis iniciado desde UI",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-07-10 05:59:33",
-    "analyst": "asd"
-  },
-  {
-    "id": 6,
-    "imageName": "manual-1783663144855",
-    "notes": "Análisis iniciado desde UI",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-07-10 05:59:04",
-    "analyst": "asd"
-  },
-  {
-    "id": 5,
-    "imageName": "manual-1782517344736",
-    "notes": "Análisis iniciado desde UI",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-06-26 23:42:24",
-    "analyst": "admin"
-  },
-  {
-    "id": 4,
-    "imageName": "manual-1782517325399",
-    "notes": "Análisis iniciado desde UI",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-06-26 23:42:05",
-    "analyst": "admin"
-  },
-  {
-    "id": 3,
-    "imageName": "manual-1782517320456",
-    "notes": "Análisis iniciado desde UI",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-06-26 23:42:00",
-    "analyst": "admin"
-  },
-  {
-    "id": 2,
-    "imageName": "test-sample",
-    "notes": "Prueba de análisis",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782514261030",
-    "analyzedAt": "2026-06-26 22:51:36",
-    "analyst": "Administrador"
-  },
-  {
-    "id": 1,
-    "imageName": "test-image-001",
-    "notes": "Prueba de análisis",
-    "result": "negativo",
-    "confidence": 0.55,
-    "modelVersion": "v1782513942000",
-    "analyzedAt": "2026-06-26 22:46:30",
-    "analyst": "Administrador"
   }
 ]

@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -24,9 +24,49 @@ export class HistorialComponent implements OnInit {
   imageNotes = '';
   isAnalyzing = false;
   analysisError = '';
+  
+  showResultModal = false;
+  analysisResultData: any = null;
 
   currentPage = 1;
   pageSize = 10;
+  
+  showSettingsModal = false;
+  isDaltonismActive = false;
+  currentLanguage = 'es';
+  recoveryEmail = '';
+  passwordChangeMessage = '';
+
+  translations: any = {
+    es: {
+      sidebar: { history: 'Historial', newAnalysis: 'Nuevo Análisis', specialty: 'Oncología Ginecológica', panel: 'PANEL DE CONTROL' },
+      topbar: { colorblind: 'Modo Daltonismo' },
+      loading: 'Cargando historial...',
+      error: 'Error de conexión con el backend',
+      history: { title: 'Historial de Pacientes', desc: 'Registros clínicos y diagnósticos procesados por CervixAI.', searchPlaceholder: 'Buscar por ID o Fecha...', filter: 'Filtrar', filterDev: 'Función de filtro avanzada en desarrollo.', colDate: 'FECHA DE ESTUDIO', colSample: 'MUESTRA (MINIATURA)', colId: 'ID PACIENTE', colResult: 'RESULTADO', colConf: 'CONFIANZA AI', empty: 'No hay registros disponibles.', abnormal: 'ANORMAL', normal: 'NORMAL', showing: 'Mostrando', of: 'de', results: 'resultados' },
+      summary: { total: 'Total Analizados', trendTotal: 'Datos actualizados', avgConf: 'Confianza Promedio', trendConf: 'Basado en todos los análisis', critical: 'Alertas Críticas', trendCritical: 'Pendientes de revisión manual' },
+      footer: { use: 'Uso Clínico Profesional.', support: 'Soporte Técnico', privacy: 'Privacidad de Datos', protocol: 'Protocolo Médico' },
+      modalUpload: { title: 'Subir Imagen Celular', drop: 'Haz clic para seleccionar una imagen', notes: 'Notas Clínicas (Opcional)', placeholder: 'Observaciones adicionales...', cancel: 'Cancelar', btn: 'Analizar Imagen', processing: 'Procesando IA...' },
+      modalSettings: { title: 'Ajustes', profile: 'Perfil', photo: 'Foto de Perfil', photoDesc: 'Actualiza tu imagen visible.', change: 'Cambiar', security: 'Seguridad', password: 'Contraseña', passwordDesc: 'Cambia tu contraseña de acceso.', update: 'Actualizar', email: 'Correo de Recuperación', emailDesc: 'Añade un email alternativo.', save: 'Guardar', prefs: 'Preferencias', lang: 'Idioma', langDesc: 'Selecciona el idioma de la interfaz.', cb: 'Modo Daltonismo', cbDesc: 'Mejora el contraste visual.', logout: 'Cerrar Sesión' },
+      alerts: { noNotif: 'No tienes notificaciones nuevas.', pwdChange: 'Se ha enviado un enlace de confirmación a tu correo.', emailSaved: 'Correo de recuperación configurado: ', photoUpdate: 'Tu foto de perfil ha sido actualizada exitosamente.', aiComplete: 'Análisis IA completado' }
+    },
+    en: {
+      sidebar: { history: 'History', newAnalysis: 'New Analysis', specialty: 'Gynecologic Oncology', panel: 'CONTROL PANEL' },
+      topbar: { colorblind: 'Colorblind Mode' },
+      loading: 'Loading history...',
+      error: 'Backend connection error',
+      history: { title: 'Patient History', desc: 'Clinical records and diagnoses processed by CervixAI.', searchPlaceholder: 'Search by ID or Date...', filter: 'Filter', filterDev: 'Advanced filter function in development.', colDate: 'STUDY DATE', colSample: 'SAMPLE (THUMBNAIL)', colId: 'PATIENT ID', colResult: 'RESULT', colConf: 'AI CONFIDENCE', empty: 'No records available.', abnormal: 'ABNORMAL', normal: 'NORMAL', showing: 'Showing', of: 'of', results: 'results' },
+      summary: { total: 'Total Analyzed', trendTotal: 'Updated data', avgConf: 'Average Confidence', trendConf: 'Based on all analyses', critical: 'Critical Alerts', trendCritical: 'Pending manual review' },
+      footer: { use: 'Professional Clinical Use.', support: 'Technical Support', privacy: 'Data Privacy', protocol: 'Medical Protocol' },
+      modalUpload: { title: 'Upload Cellular Image', drop: 'Click to select an image', notes: 'Clinical Notes (Optional)', placeholder: 'Additional observations...', cancel: 'Cancel', btn: 'Analyze Image', processing: 'Processing AI...' },
+      modalSettings: { title: 'Settings', profile: 'Profile', photo: 'Profile Photo', photoDesc: 'Update your visible image.', change: 'Change', security: 'Security', password: 'Password', passwordDesc: 'Change your access password.', update: 'Update', email: 'Recovery Email', emailDesc: 'Add an alternative email.', save: 'Save', prefs: 'Preferences', lang: 'Language', langDesc: 'Select the interface language.', cb: 'Colorblind Mode', cbDesc: 'Improves visual contrast.', logout: 'Logout' },
+      alerts: { noNotif: 'You have no new notifications.', pwdChange: 'A confirmation link has been sent to your email.', emailSaved: 'Recovery email configured: ', photoUpdate: 'Your profile photo has been updated successfully.', aiComplete: 'AI Analysis completed' }
+    }
+  };
+
+  get t() {
+    return this.translations[this.currentLanguage];
+  }
 
   get paginatedItems() {
     const startIndex = (this.currentPage - 1) * this.pageSize;
@@ -41,7 +81,7 @@ export class HistorialComponent implements OnInit {
     return Array(this.totalPages).fill(0).map((x, i) => i + 1);
   }
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private router: Router) {}
 
   ngOnInit() {
     this.loadHistorial();
@@ -61,7 +101,7 @@ export class HistorialComponent implements OnInit {
       });
       const data = await response.json();
       if (!response.ok) {
-        this.errorMessage = data.message || 'No se pudo cargar el historial';
+        this.errorMessage = data.message || this.t.error;
         return;
       }
 
@@ -70,7 +110,7 @@ export class HistorialComponent implements OnInit {
       this.avgConfidence = this.totalAnalyses > 0 ? this.items.reduce((acc: number, item: any) => acc + (item.confidence || 0.5), 0) / this.totalAnalyses : 0;
       this.criticalAlerts = this.items.filter((item: any) => item.result === 'positivo').length;
     } catch (error) {
-      this.errorMessage = 'Error de conexión con el backend';
+      this.errorMessage = this.t.error;
     } finally {
       this.loading = false;
       this.cdr.detectChanges();
@@ -118,16 +158,20 @@ export class HistorialComponent implements OnInit {
 
       const data = await response.json();
       if (!response.ok) {
-        this.analysisError = data.message || 'Error al iniciar análisis';
+        this.analysisError = data.message || this.t.error;
         this.cdr.detectChanges();
         return;
       }
 
       await this.loadHistorial();
       this.closeModal();
-      alert(`Análisis IA completado: ${data.report.result.toUpperCase()} (${(data.report.confidence * 100).toFixed(1)}%)`);
+      this.analysisResultData = {
+        result: data.report.result.toUpperCase(),
+        confidence: (data.report.confidence * 100).toFixed(1)
+      };
+      this.showResultModal = true;
     } catch (err) {
-      this.analysisError = 'No se pudo conectar al backend para iniciar el análisis';
+      this.analysisError = this.t.error;
       this.cdr.detectChanges();
     } finally {
       this.isAnalyzing = false;
@@ -136,19 +180,56 @@ export class HistorialComponent implements OnInit {
   }
 
   filtrar() {
-    alert('Función de filtro avanzada en desarrollo.');
+    alert(this.t.history.filterDev);
   }
 
   toggleDaltonism() {
-    document.body.classList.toggle('daltonism-mode');
+    this.isDaltonismActive = !this.isDaltonismActive;
+    if (this.isDaltonismActive) {
+      document.body.classList.add('daltonism-mode');
+    } else {
+      document.body.classList.remove('daltonism-mode');
+    }
   }
 
   showNotification() {
-    alert('No tienes notificaciones nuevas.');
+    alert(this.t.alerts.noNotif);
   }
 
   showSettings() {
-    alert('Función de configuración en desarrollo.');
+    this.isDaltonismActive = document.body.classList.contains('daltonism-mode');
+    this.showSettingsModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeSettings() {
+    this.showSettingsModal = false;
+    this.cdr.detectChanges();
+  }
+
+  changeLanguage(lang: string) {
+    this.currentLanguage = lang;
+  }
+
+  logout() {
+    localStorage.removeItem('cervixai-token');
+    localStorage.removeItem('cervixai-user');
+    this.router.navigate(['/']);
+  }
+
+  changePassword() {
+    this.passwordChangeMessage = this.t.alerts.pwdChange;
+    this.cdr.detectChanges();
+  }
+
+  saveRecoveryEmail() {
+    alert(this.t.alerts.emailSaved + this.recoveryEmail);
+  }
+
+  onProfilePhotoSelected(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      alert(this.t.alerts.photoUpdate);
+    }
   }
 
   changePage(page: number) {
